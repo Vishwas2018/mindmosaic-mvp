@@ -39,9 +39,18 @@
 | 10 | Dashboards | ⬜ | 02, 03, 05-dashboard mockups |
 | 11 | Launch Prep | ⬜ | — |
 
+## Architecture Decision: Supabase Cloud (no Docker)
+
+Recorded 2026-04-18. Using Supabase Cloud for all environments — no local Docker stack.
+- Migrations deployed via `supabase db push` (requires CLI, no Docker)
+- RLS tests run via `pnpm test:rls` (`supabase test db --db-url $DATABASE_URL`)
+- CI contains only `lint-typecheck-build` job (no Docker in CI)
+- `DATABASE_URL` = direct Postgres connection string from Supabase dashboard
+
 ## Remaining Blockers
 
-- `supabase CLI` not installed → install before merging PR 1 fully (db-tests CI job)
+- `supabase CLI` not installed → `winget install Supabase.CLI` (no Docker needed)
+- `supabase link --project-ref hodwyzmpmavvgvvgmpbw` → run once after CLI install
 - `00-design-system.html` is a 477-byte stub → must be populated before PR 4
 - Governance files renamed ✅ (was `.md.md` double extension)
 - `.env.example` real keys replaced with placeholders ✅

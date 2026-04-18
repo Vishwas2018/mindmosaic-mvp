@@ -8,7 +8,11 @@
     "build": "pnpm -C apps/web build",
     "typecheck": "pnpm -C apps/web typecheck",
     "lint": "pnpm -C apps/web lint",
-    "test:rls": "supabase test db",
-    "db:reset": "supabase db reset"
+    "test:rls": "supabase test db --db-url \"$DATABASE_URL\"",
+    "db:push": "supabase db push",
+    "routine": "tsx scripts/routine.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.0.0"
   }
 }
