@@ -1,0 +1,95 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Routine: Morning Standup",
+      "type": "shell",
+      "command": "pnpm routine morning-standup && code docs/runtime/last-routine.md",
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "runOptions": {
+        "instanceLimit": 1
+      }
+    },
+    {
+      "label": "Routine: Pre-Commit Check",
+      "type": "shell",
+      "command": "pnpm routine pre-commit && code docs/runtime/last-routine.md",
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "runOptions": {
+        "instanceLimit": 1
+      }
+    },
+    {
+      "label": "Routine: End of Day",
+      "type": "shell",
+      "command": "pnpm routine end-of-day && code docs/runtime/last-routine.md",
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "runOptions": {
+        "instanceLimit": 1
+      }
+    },
+    {
+      "label": "Routine: Weekly Review",
+      "type": "shell",
+      "command": "pnpm routine weekly-review && code docs/runtime/last-routine.md",
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "runOptions": {
+        "instanceLimit": 1
+      }
+    },
+    {
+      "label": "Routine: Pre-Merge Gate",
+      "type": "shell",
+      "command": "pnpm routine pre-merge-gate && code docs/runtime/last-routine.md",
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "runOptions": {
+        "instanceLimit": 1
+      }
+    },
+    {
+      "label": "Routine: Incident Triage",
+      "type": "shell",
+      "command": "pnpm routine incident-triage && code docs/runtime/last-routine.md",
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "clear": true
+      },
+      "problemMatcher": [],
+      "runOptions": {
+        "instanceLimit": 1
+      }
+    }
+  ]
+}

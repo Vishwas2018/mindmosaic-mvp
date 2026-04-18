@@ -13,4 +13,20 @@ extra_search_path = ["public", "extensions"]
 max_rows = 1000
 
 [db]
-major_version = 15
+major_version = 17
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/**"]
+
+[auth.email]
+# Disable email confirmation for development — enable before production launch
+enable_confirmations = false
+
+# JWT custom access token hook — injects tenant_id and role into app_metadata.
+# Register the function in the Supabase Dashboard:
+#   Authentication → Hooks → Custom Access Token → choose custom_access_token_hook
+[auth.hook.custom_access_token]
+enabled = true
+uri = "pg-functions://postgres/public/custom_access_token_hook"

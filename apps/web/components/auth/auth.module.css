@@ -1,0 +1,279 @@
+/* ─── Page wrapper ──────────────────────────────────────────── */
+.authPageWrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  background:
+    radial-gradient(ellipse 90% 60% at 95% 50%, rgba(239,104,67,.03), transparent 60%),
+    radial-gradient(1400px 700px at 10% -15%, rgba(89,37,168,.05), transparent 55%),
+    radial-gradient(1000px 600px at 95% 105%, rgba(89,37,168,.04), transparent 55%),
+    #FAF8FF;
+  padding: 2rem;
+}
+
+/* ─── Card container ────────────────────────────────────────── */
+.authCard {
+  position: relative;
+  height: 680px;
+  width: 1060px;
+  max-width: 100%;
+  overflow: hidden;
+  background-color: #FFFFFF;
+  border: 1px solid #E9E5F5;
+  border-radius: 18px;
+  box-shadow:
+    0 0 0 1px rgba(30,27,75,.03),
+    0 1px 2px rgba(89,37,168,.04),
+    0 8px 16px -4px rgba(89,37,168,.06),
+    0 24px 56px -16px rgba(30,27,75,.13);
+}
+
+/* ─── Gradient blob ─────────────────────────────────────────── */
+.authCard::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: 0;
+  height: 200%;
+  width: 300%;
+  transform: translate(35%, 0);
+  background-image:
+    radial-gradient(ellipse 500px 350px at 25% 35%, rgba(124,58,237,.22), transparent 70%),
+    radial-gradient(ellipse 350px 250px at 75% 75%, rgba(46,15,92,.3), transparent 70%),
+    linear-gradient(145deg, #7c3aed 0%, #5925a8 30%, #4a1d96 55%, #2e0f5c 100%);
+  transition:
+    transform 1.2s cubic-bezier(.25,1,.5,1),
+    right     1.2s cubic-bezier(.25,1,.5,1);
+  z-index: 6;
+  border-bottom-right-radius: 50%;
+  border-top-left-radius: 50%;
+}
+
+/* Sign-in mode: blob covers LEFT half */
+.authCard.signIn::before {
+  transform: translate(0, 0);
+  right: 50%;
+}
+
+/* Sign-up mode: blob covers RIGHT half */
+.authCard.signUp::before {
+  transform: translate(100%, 0);
+  right: 50%;
+}
+
+/* ─── Two-column grid ───────────────────────────────────────── */
+.authRow {
+  display: flex;
+  flex-wrap: wrap;
+  height: 100%;
+}
+.authCol {
+  width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── Overlay row (z-index 8, on top of blob) ──────────────── */
+.contentRow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 8;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  height: 100%;
+}
+.overlayCol {
+  width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+/* ─── Overlay text ──────────────────────────────────────────── */
+.overlayText {
+  margin: 3.5rem;
+  color: #fff;
+  text-align: center;
+}
+
+/* Logo on purple panel */
+.overlayLogo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .35rem;
+  margin-bottom: .75rem;
+}
+.overlayLogoSvg {
+  width: 52px;
+  height: 43px;
+  display: block;
+  animation: overlayBrainFlash 2.6s ease-in-out infinite;
+}
+@keyframes overlayBrainFlash {
+  0%, 100% { opacity: 1; filter: drop-shadow(0 0 0px rgba(239,104,67,0)); }
+  45%       { opacity: .88; filter: drop-shadow(0 0 6px rgba(239,140,86,.75)) drop-shadow(0 0 12px rgba(255,255,255,.2)); }
+}
+.overlayWordmark {
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -.025em;
+  line-height: 1;
+  color: #fff;
+}
+.overlayWordmark .wMind   { color: rgba(255,255,255,.92); }
+.overlayWordmark .wMosaic { color: #ef8c56; }
+
+.overlayText h2 {
+  font-family: var(--font-dm-serif), 'DM Serif Display', serif;
+  font-size: 2.6rem;
+  font-weight: 400;
+  letter-spacing: -.025em;
+  margin: .5rem 0 .5rem;
+  text-shadow: 0 1px 3px rgba(0,0,0,.1);
+  transition: transform 1.2s cubic-bezier(.25,1,.5,1), opacity 1.2s cubic-bezier(.25,1,.5,1);
+}
+.overlayText p {
+  font-size: .85rem;
+  opacity: .82;
+  max-width: 260px;
+  margin: 0 auto;
+  line-height: 1.6;
+  font-weight: 400;
+  transition: transform 1.2s cubic-bezier(.25,1,.5,1), opacity 1.2s cubic-bezier(.25,1,.5,1);
+}
+
+/* ── Hero benefits list on purple panel ─────────────────────── */
+.overlayBenefits {
+  list-style: none;
+  padding: 0;
+  margin: 1rem auto 0;
+  max-width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: .55rem;
+  text-align: left;
+  transition: transform 1.2s cubic-bezier(.25,1,.5,1), opacity 1.2s cubic-bezier(.25,1,.5,1);
+}
+.overlayBenefits li {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: .78rem;
+  color: rgba(255,255,255,.88);
+  line-height: 1.4;
+}
+.overlayBenefits svg {
+  flex-shrink: 0;
+  color: #ef8c56;
+}
+
+/* Sign-in overlay text starts slid left, sign-up starts slid right */
+.overlaySignin .overlayText h2,
+.overlaySignin .overlayText p,
+.overlaySignin .overlayBenefits,
+.overlaySignin .overlayLogo { transform: translateX(-250%); opacity: 0; }
+
+.overlaySignup .overlayText h2,
+.overlaySignup .overlayText p,
+.overlaySignup .overlayBenefits,
+.overlaySignup .overlayLogo { transform: translateX(250%); opacity: 0; }
+
+/* Active state — slide to centre */
+.authCard.signIn .overlaySignin .overlayText h2,
+.authCard.signIn .overlaySignin .overlayText p,
+.authCard.signIn .overlaySignin .overlayBenefits,
+.authCard.signIn .overlaySignin .overlayLogo { transform: translateX(0); opacity: 1; }
+
+.authCard.signUp .overlaySignup .overlayText h2,
+.authCard.signUp .overlaySignup .overlayText p,
+.authCard.signUp .overlaySignup .overlayBenefits,
+.authCard.signUp .overlaySignup .overlayLogo { transform: translateX(0); opacity: 1; }
+
+/* ─── Form card (inside each col) ──────────────────────────── */
+.formCard {
+  padding: 1.75rem 1.6rem;
+  background-color: #FFFFFF;
+  border: 1px solid #E9E5F5;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 25rem;
+  box-shadow:
+    0 0 0 1px rgba(30,27,75,.02),
+    0 2px 8px rgba(89,37,168,.08);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(14px);
+  transition: transform .3s ease-in, opacity .3s ease-in, visibility .3s;
+}
+
+.formCard.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition: transform .5s ease-out .6s, opacity .5s ease-out .6s, visibility 0s .6s;
+}
+
+/* ─── Form header ───────────────────────────────────────────── */
+.formHeader { text-align: left; margin-bottom: 1.1rem; }
+.formHeader h1 {
+  font-family: var(--font-dm-serif), 'DM Serif Display', serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: -.02em;
+  color: #1E1B4B;
+  line-height: 1.15;
+}
+.formHeader p {
+  margin-top: .3rem;
+  font-size: .8rem;
+  color: #7C7399;
+  line-height: 1.5;
+}
+
+/* ─── Responsive ────────────────────────────────────────────── */
+@media (max-width: 560px) {
+  .authPageWrapper { padding: 0; }
+  .authCard {
+    height: 100vh;
+    border-radius: 0;
+  }
+  .authCard::before,
+  .authCard.signIn::before,
+  .authCard.signUp::before {
+    height: 100vh;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 0;
+    z-index: 0;
+    transform: none;
+    right: 0;
+  }
+  .contentRow { align-items: flex-start; }
+  .authCol {
+    width: 100%;
+    position: absolute;
+    padding: 2rem 1.25rem;
+    background-color: #FFFFFF;
+    border-top-left-radius: 2rem;
+    border-top-right-radius: 2rem;
+    transform: translateY(100%);
+    transition: 1s ease-in-out;
+    top: 0;
+  }
+  .formCard {
+    box-shadow: none;
+    padding: 0;
+    border: none;
+  }
+  .overlayText { margin: 2rem; }
+  .overlayText p { display: none; }
+  .overlayText h2 { margin: .5rem; font-size: 2rem; }
+}
