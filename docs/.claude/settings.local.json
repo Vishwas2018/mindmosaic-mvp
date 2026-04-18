@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp \"authentication.html\" \"02-login.html\")",
+      "Bash(sed 's|<title>MindMosaic — Sign In / Sign Up</title>|<title>MindMosaic — Sign In</title>|' \"authentication.html\")",
+      "Bash(sed 's|<title>MindMosaic — Sign In / Sign Up</title>|<title>MindMosaic — Sign Up</title>|' \"authentication.html\")",
+      "Bash(cp \"parent-dashboard.html\"  \"03-parent-dashboard.html\")",
+      "Bash(cp \"billing.html\"            \"05-billing.html\")",
+      "Bash(cp \"student-dashboard.html\" \"06-student-home.html\")",
+      "Bash(cp \"session-selection.html\" \"06b-session-selection.html\")",
+      "Bash(cp \"exam engine.html\"       \"07-session-player.html\")",
+      "Bash(python3 *)",
+      "Bash(awk -F'[\\(\\),]' '{if\\($2+0 < 340\\) print $0}')",
+      "Bash(node *)",
+      "Bash(start *)"
+    ]
+  }
+}

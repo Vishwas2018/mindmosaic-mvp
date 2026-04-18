@@ -1,0 +1,16 @@
+{
+  "folders": [
+    {"name": "📱 app (apps/web)", "path": "apps/web"},
+    {"name": "🗄  supabase", "path": "supabase"},
+    {"name": "📚 docs", "path": "docs"},
+    {"name": "🏠 root", "path": "."},
+  ],
+  "settings": {
+    "files.exclude": {
+      "apps": true,
+      "supabase": true,
+      "docs": true,
+    },
+    "liveServer.settings.multiRootWorkspaceName": "📚 docs",
+  },
+}

@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "bradlc.vscode-tailwindcss",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "supabase.supabase-vscode",
+    "shd101wyy.markdown-preview-enhanced",
+    "ms-vscode.live-server",
+    "ms-playwright.playwright",
+    "mikestead.dotenv"
+  ]
+}
