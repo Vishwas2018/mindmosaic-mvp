@@ -1,0 +1,3 @@
+-- PR 1 placeholder migration.
+-- Business tables and RLS policies are added from PR 2 onward.
+-- Run: supabase db reset

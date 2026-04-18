@@ -1,2 +1,0 @@
-# PR 1 scaffolds Next.js 14 here via:
-#   pnpm create next-app@14 apps/web --ts --tailwind --app --eslint --import-alias "@/*"

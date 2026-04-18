@@ -6,14 +6,14 @@ across NAPLAN Y3/Y5 and ICAS Y3/Y5.
 ## Prerequisites
 
 - Node.js 20+
-- pnpm 9+
+- pnpm 10+
 - Supabase CLI (`brew install supabase/tap/supabase` or equivalent)
 - Docker (for local Supabase)
 
 ## Getting Started
 
 ```bash
-# Install dependencies (populated in PR 1)
+# Install dependencies
 pnpm install
 
 # Start local Supabase
