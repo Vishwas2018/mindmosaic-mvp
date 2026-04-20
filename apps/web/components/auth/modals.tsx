@@ -1,7 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { forgotPasswordAction } from "@/lib/auth/actions";
+
+// ── Focus trap + Escape key ───────────────────────────────────────────────────
+function useModalBehaviour(
+  boxRef: React.RefObject<HTMLDivElement>,
+  onClose: () => void
+) {
+  useEffect(() => {
+    const box = boxRef.current;
+    if (!box) return;
+
+    // Focus the first focusable element on mount
+    const focusable = box.querySelectorAll<HTMLElement>(
+      'button, input, textarea, select, a[href], [tabindex]:not([tabindex="-1"])'
+    );
+    focusable[0]?.focus();
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") { onClose(); return; }
+      if (e.key !== "Tab") return;
+      const first = focusable[0];
+      const last  = focusable[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last?.focus(); }
+      } else {
+        if (document.activeElement === last)  { e.preventDefault(); first?.focus(); }
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [boxRef, onClose]);
+}
 
 function CloseBtn({ onClose }: { onClose: () => void }) {
   return (
@@ -19,6 +51,9 @@ export function ForgotPasswordModal({ onClose }: { onClose: () => void }) {
   const [email,   setEmail]   = useState("");
   const [status,  setStatus]  = useState<"idle" | "loading" | "ok" | "fail">("idle");
   const [message, setMessage] = useState("");
+  const boxRef = useRef<HTMLDivElement>(null);
+  const stableClose = useCallback(onClose, [onClose]);
+  useModalBehaviour(boxRef, stableClose);
 
   async function handleSend() {
     if (!email.trim()) { setStatus("fail"); setMessage("Enter your email address."); return; }
@@ -39,7 +74,7 @@ export function ForgotPasswordModal({ onClose }: { onClose: () => void }) {
       role="dialog" aria-modal="true" aria-labelledby="forgot-title"
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="modal-box">
+      <div className="modal-box" ref={boxRef}>
         <CloseBtn onClose={onClose} />
         <h2 id="forgot-title">Reset your password</h2>
         <p>Enter the email address associated with your account and we&apos;ll send you a link to reset your password.</p>
@@ -52,7 +87,6 @@ export function ForgotPasswordModal({ onClose }: { onClose: () => void }) {
               value={email}
               onChange={e => setEmail(e.target.value)}
               onKeyDown={e => e.key === "Enter" && handleSend()}
-              autoFocus
             />
             {status === "fail" && (
               <div className="auth-notice error" role="alert" style={{ marginTop: ".75rem" }}>
@@ -82,13 +116,17 @@ export function ForgotPasswordModal({ onClose }: { onClose: () => void }) {
 
 // ── Free Trial ────────────────────────────────────────────────────────────────
 export function TrialModal({ onClose }: { onClose: () => void }) {
+  const boxRef = useRef<HTMLDivElement>(null);
+  const stableClose = useCallback(onClose, [onClose]);
+  useModalBehaviour(boxRef, stableClose);
+
   return (
     <div
       className="modal-overlay"
       role="dialog" aria-modal="true" aria-labelledby="trial-title"
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="modal-box">
+      <div className="modal-box" ref={boxRef}>
         <CloseBtn onClose={onClose} />
         <h2 id="trial-title">Try MindMosaic free</h2>
         <p>Explore sample exams and see how adaptive learning works — no account needed.</p>
@@ -116,13 +154,17 @@ export function TrialModal({ onClose }: { onClose: () => void }) {
 
 // ── Contact ───────────────────────────────────────────────────────────────────
 export function ContactModal({ onClose }: { onClose: () => void }) {
+  const boxRef = useRef<HTMLDivElement>(null);
+  const stableClose = useCallback(onClose, [onClose]);
+  useModalBehaviour(boxRef, stableClose);
+
   return (
     <div
       className="modal-overlay"
       role="dialog" aria-modal="true" aria-labelledby="contact-title"
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="modal-box">
+      <div className="modal-box" ref={boxRef}>
         <CloseBtn onClose={onClose} />
         <h2 id="contact-title">Get in touch</h2>
         <p>Our support team is happy to help with any questions about your account or the platform.</p>

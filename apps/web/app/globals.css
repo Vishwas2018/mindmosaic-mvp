@@ -4,6 +4,9 @@
 
 /* ─── Tokens ────────────────────────────────────────────────── */
 :root {
+  --color-brand:       #1800ad;
+  --color-brand-hover: #1200a0;
+
   --primary:       #5925a8;
   --primary-d:     #4a1d96;
   --primary-ink:   #2e0f5c;
@@ -36,6 +39,31 @@
   --shadow-form:
     0 0 0 1px rgba(30,27,75,.02),
     0 2px 8px rgba(89,37,168,.08);
+  --shadow-card-hover:
+    0 0 0 1px rgba(30,27,75,.03),
+    0 4px 12px rgba(89,37,168,.08),
+    0 8px 24px -8px rgba(89,37,168,.12);
+  --shadow-elevated:
+    0 8px 24px rgba(89,37,168,.1),
+    0 2px 6px rgba(89,37,168,.06);
+  --shadow-ring: 0 0 0 3px rgba(89,37,168,.15);
+
+  /* ─── Motion ──────────────────────────────────────── */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  --fast: var(--transition-fast);
+  --base: var(--transition-base);
+  --slow: var(--transition-slow);
+
+  /* ─── Radius ──────────────────────────────────────── */
+  --radius-card:   12px;
+  --radius-button: 8px;
+  --radius-pill:   9999px;
+  --radius-input:  10px;
+  --r-card: var(--radius-card);
+  --r-btn:  var(--radius-button);
+  --r-pill: var(--radius-pill);
 }
 
 /* ─── Base ──────────────────────────────────────────────────── */
@@ -474,7 +502,7 @@ body {
   align-items: center;
   gap: .5rem;
   text-decoration: none;
-  padding: .32rem .85rem .32rem .4rem;
+  padding: .42rem .95rem .42rem .52rem;
   border-radius: 999px;
   background: rgba(255,255,255,.92);
   border: 1px solid rgba(89,37,168,.15);
@@ -487,24 +515,24 @@ body {
   border-color: rgba(89,37,168,.25);
 }
 @keyframes brain-flash {
-  0%, 100% { opacity: 1; filter: drop-shadow(0 0 0px rgba(239,104,67,0)); }
-  45%       { opacity: .88; filter: drop-shadow(0 0 5px rgba(239,104,67,.65)) drop-shadow(0 0 10px rgba(124,58,237,.35)); }
+  0%, 100% { opacity: 1;   filter: drop-shadow(0 0 0px  rgba(239,104,67,0)); }
+  45%       { opacity: .88; filter: drop-shadow(0 0 5px  rgba(239,104,67,.65)) drop-shadow(0 0 10px rgba(124,58,237,.35)); }
 }
-.brand-brain-svg {
-  width: 28px;
-  height: 23px;
+/* Static SVG logo in the brand pill */
+.brand-logo-img {
+  height: 32px;
+  max-width: min(178px, 100%);
+  width: auto;
   display: block;
   flex-shrink: 0;
   animation: brain-flash 2.6s ease-in-out infinite;
 }
-.brand-wordmark {
-  font-size: .84rem;
-  font-weight: 800;
-  letter-spacing: -.03em;
-  line-height: 1;
+.brand-pill:hover .brand-logo-img {
+  animation-play-state: paused;
 }
-.brand-wordmark .w-mind   { color: #5925a8; }
-.brand-wordmark .w-mosaic { color: #ef6843; }
+@media (prefers-reduced-motion: reduce) {
+  .brand-logo-img { animation: none; }
+}
 
 /* ─── Back to home ──────────────────────────────────────────── */
 .back-to-home {
@@ -673,3 +701,122 @@ body {
 @layer utilities {
   .text-balance { text-wrap: balance; }
 }
+
+/* ─── Shared UI Classes (from 02-dashboard.html) ───────────── */
+
+/* Card */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+.card-interactive { cursor: pointer; }
+.card-interactive:hover {
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-1px);
+}
+.card-interactive:focus-within {
+  box-shadow: var(--shadow-ring), var(--shadow-card-hover);
+}
+
+/* Button base + variants */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1;
+  border-radius: var(--radius-button);
+  padding: 10px 18px;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+.btn:focus-visible { box-shadow: 0 0 0 3px rgba(89,37,168,.25); }
+.btn-secondary {
+  background: var(--surface);
+  color: var(--primary);
+  border: 1px solid var(--primary-l);
+}
+.btn-secondary:hover { background: #F5F3FF; border-color: #C4B5FD; }
+.btn-ghost {
+  background: transparent;
+  color: var(--text-2);
+}
+.btn-ghost:hover { background: #F0EDF8; color: var(--text); }
+
+/* Generic pill badge */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  line-height: 1.4;
+}
+
+/* Skeleton loading */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--border) 25%, #F0EDF8 50%, var(--border) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 6px;
+}
+
+/* Nav links */
+.nav-link {
+  position: relative;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+}
+.nav-link:hover   { color: var(--text); background: #F0EDF8; }
+.nav-link-active  { color: var(--primary); background: #F5F3FF; }
+
+/* Progress bar */
+.progress-track {
+  height: 6px;
+  background: var(--border);
+  border-radius: 100px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 600ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Trend indicators */
+.trend-up     { color: var(--success); }
+.trend-down   { color: var(--error); }
+.trend-steady { color: var(--muted-2); }
+
+/* Section labels */
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted-2);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar          { width: 6px; height: 6px; }
+::-webkit-scrollbar-track    { background: transparent; }
+::-webkit-scrollbar-thumb    { background: var(--border-strong); border-radius: 100px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted-2); }

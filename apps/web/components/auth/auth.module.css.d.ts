@@ -9,10 +9,8 @@ declare const styles: {
   readonly overlayCol:       string;
   readonly overlayText:      string;
   readonly overlayLogo:      string;
-  readonly overlayLogoSvg:   string;
-  readonly overlayWordmark:  string;
-  readonly wMind:            string;
-  readonly wMosaic:          string;
+  readonly overlayLogoImg:   string;
+  readonly overlayBenefits:  string;
   readonly overlaySignin:    string;
   readonly overlaySignup:    string;
   readonly formCard:         string;

@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp C:/Users/vishw/GitHub/mindmosaic-mvp/mindmosaic/apps/web/app/fonts/MindMosaic_Logo.svg C:/Users/vishw/GitHub/mindmosaic-mvp/mindmosaic/apps/web/public/logo-full.svg)",
+      "Bash(cp C:/Users/vishw/GitHub/mindmosaic-mvp/mindmosaic/apps/web/app/fonts/MindMosaic_Favicon.svg C:/Users/vishw/GitHub/mindmosaic-mvp/mindmosaic/apps/web/public/favicon.svg)",
+      "Bash(command -v supabase)",
+      "Read(//c/Users/vishw/GitHub/mindmosaic-mvp/mindmosaic/**)",
+      "Bash(npx supabase *)",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(mkdir -p /tmp/supabase-deploy/supabase/functions/student-login)",
+      "Bash(mkdir -p /tmp/supabase-deploy/supabase/functions/create-child)",
+      "Bash(cp C:/Users/vishw/GitHub/mindmosaic-mvp/mindmosaic/supabase/functions/auth/student-login/index.ts /tmp/supabase-deploy/supabase/functions/student-login/index.ts)",
+      "Bash(cp C:/Users/vishw/GitHub/mindmosaic-mvp/mindmosaic/supabase/functions/users/create-child/index.ts /tmp/supabase-deploy/supabase/functions/create-child/index.ts)",
+      "Read(//tmp/supabase-deploy/supabase/**)",
+      "Bash(pnpm typecheck *)",
+      "Bash(node -e \"const sharp = require\\('sharp'\\); console.log\\('sharp available, version:', require\\('sharp/package.json'\\).version\\);\")",
+      "Bash(which inkscape *)",
+      "Bash(which rsvg-convert *)",
+      "Bash(pnpm lint *)"
+    ]
+  }
+}

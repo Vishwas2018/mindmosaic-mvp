@@ -1,12 +1,19 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useRouter }              from "next/navigation";
-import { LogoSymbol }             from "./LogoSymbol";
+import { useRouter }             from "next/navigation";
 import { ForgotPasswordModal, TrialModal, ContactModal } from "./modals";
-import { evalPasswordRules }      from "@/lib/auth/validation";
+import { evalPasswordRules }     from "@/lib/auth/validation";
 import { signInAction, signUpAction } from "@/lib/auth/actions";
+import { MindMosaicLogo } from "@/components/branding/MindMosaicLogo";
 import styles from "./auth.module.css";
+
+// Allow the HTML `inert` attribute in JSX (@types/react experimental.d.ts uses boolean)
+declare module "react" {
+  interface HTMLAttributes<T> { // eslint-disable-line @typescript-eslint/no-unused-vars
+    inert?: boolean;
+  }
+}
 
 type Modal = "forgot" | "trial" | "contact" | null;
 
@@ -86,15 +93,23 @@ function EyeIcon({ open }: { open: boolean }) {
 export function AuthCard({ initialView = "sign-in" }: { initialView?: "sign-in" | "sign-up" }) {
   const router = useRouter();
 
-  const [view,  setView]  = useState<"sign-in" | "sign-up">(initialView);
-  const [modal, setModal] = useState<Modal>(null);
+  const [view,      setView]     = useState<"sign-in" | "sign-up">(initialView);
+  const [loginTab,  setLoginTab] = useState<"parent" | "student">("parent");
+  const [modal,     setModal]    = useState<Modal>(null);
 
-  // Sign-in state
+  // Sign-in state (parent)
   const [siEmail,    setSiEmail]    = useState("");
   const [siPassword, setSiPassword] = useState("");
   const [siShowPw,   setSiShowPw]   = useState(false);
   const [siError,    setSiError]    = useState("");
   const [siLoading,  setSiLoading]  = useState(false);
+
+  // Student login state
+  const [stUsername, setStUsername] = useState("");
+  const [stPin,      setStPin]      = useState("");
+  const [stShowPin,  setStShowPin]  = useState(false);
+  const [stError,    setStError]    = useState("");
+  const [stLoading,  setStLoading]  = useState(false);
 
   // Sign-up state
   const [suName,     setSuName]     = useState("");
@@ -106,14 +121,21 @@ export function AuthCard({ initialView = "sign-in" }: { initialView?: "sign-in" 
   const [suError,    setSuError]    = useState("");
   const [suLoading,  setSuLoading]  = useState(false);
 
-  const pwRules = evalPasswordRules(suPassword);
+  const pwRules     = evalPasswordRules(suPassword);
   const confirmHint: "success" | "error" | null =
     suConfirm === "" ? null : suConfirm === suPassword ? "success" : "error";
+  const suFormValid =
+    Object.values(pwRules).every(Boolean) &&
+    confirmHint === "success" &&
+    suName.trim().length > 0 &&
+    suEmail.trim().length > 0;
 
   const switchView = useCallback((next: "sign-in" | "sign-up") => {
     setSiEmail(""); setSiPassword(""); setSiShowPw(false); setSiError(""); setSiLoading(false);
+    setStUsername(""); setStPin(""); setStShowPin(false); setStError(""); setStLoading(false);
     setSuName(""); setSuEmail(""); setSuPassword(""); setSuConfirm("");
     setSuShowPw(false); setSuShowCf(false); setSuError(""); setSuLoading(false);
+    setLoginTab("parent");
     setView(next);
   }, []);
 
@@ -137,10 +159,45 @@ export function AuthCard({ initialView = "sign-in" }: { initialView?: "sign-in" 
       password: suPassword, confirmPassword: suConfirm,
     });
     if (result.success) {
-      router.push("/dashboard");
+      router.push(result.data.redirectTo);
     } else {
       setSuError(result.error);
       setSuLoading(false);
+    }
+  }
+
+  async function handleStudentLogin(e: React.FormEvent) {
+    e.preventDefault();
+    if (!stUsername.trim() || !/^\d{6}$/.test(stPin)) return;
+    setStLoading(true); setStError("");
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/student-login`,
+        {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify({ username: stUsername.trim(), pin: stPin }),
+        }
+      );
+      const data = await res.json() as { access_token?: string; refresh_token?: string; error?: string; message?: string };
+      if (!res.ok) {
+        if (res.status === 429) {
+          setStError("Too many attempts. Please try again in 15 minutes.");
+        } else {
+          setStError("Invalid username or PIN.");
+        }
+        setStLoading(false);
+        return;
+      }
+      if (data.access_token && data.refresh_token) {
+        const { createBrowserSupabaseClient } = await import("@/lib/supabase/browser");
+        const supabase = createBrowserSupabaseClient();
+        await supabase.auth.setSession({ access_token: data.access_token, refresh_token: data.refresh_token });
+        router.push("/dashboard");
+      }
+    } catch {
+      setStError("Something went wrong. Please try again.");
+      setStLoading(false);
     }
   }
 
@@ -148,17 +205,10 @@ export function AuthCard({ initialView = "sign-in" }: { initialView?: "sign-in" 
 
   return (
     <>
-      <LogoSymbol />
-
       <div className={styles.authPageWrapper}>
         {/* Brand pill (top-right) */}
         <a href="/" className="brand-pill" aria-label="MindMosaic home">
-          <svg className="brand-brain-svg" viewBox="85 56 262 218" aria-hidden="true">
-            <use href="#mm-logo" width="1235" height="317" />
-          </svg>
-          <span className="brand-wordmark">
-            <span className="w-mind">Mind</span><span className="w-mosaic">Mosaic</span>
-          </span>
+          <MindMosaicLogo className="brand-logo-img" />
         </a>
 
         {/* Back to home (top-left) */}
@@ -174,8 +224,8 @@ export function AuthCard({ initialView = "sign-in" }: { initialView?: "sign-in" 
         <div className={`${styles.authCard} ${isSignIn ? styles.signIn : styles.signUp}`}>
           <div className={styles.authRow}>
 
-            {/* ── Sign-up column (LEFT) ─────────────────────── */}
-            <div className={styles.authCol}>
+            {/* ── Sign-up column (LEFT) — inert when sign-in is active ── */}
+            <div className={styles.authCol} {...(isSignIn ? { inert: true } : {})}>
               <div className={`${styles.formCard} ${!isSignIn ? styles.active : ""}`}>
                 <div className={styles.formHeader}>
                   <h1>Create your account</h1>
@@ -255,7 +305,7 @@ export function AuthCard({ initialView = "sign-in" }: { initialView?: "sign-in" 
                     )}
                   </div>
 
-                  <button type="submit" className="btn-primary" disabled={suLoading}>
+                  <button type="submit" className="btn-primary" disabled={suLoading || !suFormValid}>
                     {suLoading ? "Creating account…" : "Create account"}
                   </button>
                 </form>
@@ -293,54 +343,109 @@ export function AuthCard({ initialView = "sign-in" }: { initialView?: "sign-in" 
               </div>
             </div>
 
-            {/* ── Sign-in column (RIGHT) ────────────────────── */}
-            <div className={styles.authCol}>
+            {/* ── Sign-in column (RIGHT) — inert when sign-up is active ── */}
+            <div className={styles.authCol} {...(!isSignIn ? { inert: true } : {})}>
               <div className={`${styles.formCard} ${isSignIn ? styles.active : ""}`}>
                 <div className={styles.formHeader}>
-                  <h1>Welcome back</h1>
-                  <p>Sign in to continue your learning journey.</p>
+                  <h1>{loginTab === "student" ? "Student sign in" : "Welcome back"}</h1>
+                  <p>{loginTab === "student" ? "Enter your username and PIN to continue." : "Sign in to continue your learning journey."}</p>
                 </div>
 
-                {siError && <div className="auth-notice error" role="alert">{siError}</div>}
-
-                <form onSubmit={handleSignIn} noValidate>
-                  {/* Email */}
-                  <div className="input-group">
-                    <input id="si-email" type="email" placeholder=" " autoComplete="email"
-                      value={siEmail} onChange={e => setSiEmail(e.target.value)} />
-                    <label className="floating-label" htmlFor="si-email">Email address</label>
-                    <span className="input-icon">
-                      <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/></svg>
-                    </span>
-                  </div>
-
-                  {/* Password */}
-                  <div className="input-group">
-                    <input id="si-password" type={siShowPw ? "text" : "password"} placeholder=" "
-                      autoComplete="current-password"
-                      value={siPassword} onChange={e => setSiPassword(e.target.value)} />
-                    <label className="floating-label" htmlFor="si-password">Password</label>
-                    <span className="input-icon">
-                      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                    </span>
-                    <button type="button" className="toggle-visibility"
-                      aria-label={siShowPw ? "Hide password" : "Show password"}
-                      onClick={() => setSiShowPw(v => !v)}>
-                      <EyeIcon open={siShowPw} />
+                {/* ── Login tab toggle ─── */}
+                <div style={{ display: "flex", gap: ".3rem", marginBottom: ".75rem", background: "var(--surface-alt)", borderRadius: "10px", padding: ".25rem" }}>
+                  {(["parent", "student"] as const).map(tab => (
+                    <button
+                      key={tab}
+                      type="button"
+                      onClick={() => { setLoginTab(tab); setSiError(""); setStError(""); }}
+                      style={{
+                        flex: 1, height: "34px", border: "none", cursor: "pointer", borderRadius: "8px", fontSize: ".76rem",
+                        fontWeight: 600, fontFamily: "inherit", transition: "all .2s",
+                        background: loginTab === tab ? "var(--surface)" : "transparent",
+                        color: loginTab === tab ? "var(--primary)" : "var(--muted)",
+                        boxShadow: loginTab === tab ? "0 1px 4px rgba(89,37,168,.1)" : "none",
+                      }}
+                    >
+                      {tab === "parent" ? "Parent / Teacher" : "Student"}
                     </button>
-                  </div>
+                  ))}
+                </div>
 
-                  <div className="inline-row">
-                    <span />
-                    <button type="button" className="link-btn" onClick={() => setModal("forgot")}>
-                      Forgot password?
-                    </button>
-                  </div>
+                {/* ── Parent / Teacher sign-in ── */}
+                {loginTab === "parent" && (
+                  <>
+                    {siError && <div className="auth-notice error" role="alert">{siError}</div>}
+                    <form onSubmit={handleSignIn} noValidate>
+                      <div className="input-group">
+                        <input id="si-email" type="email" placeholder=" " autoComplete="email"
+                          value={siEmail} onChange={e => setSiEmail(e.target.value)} />
+                        <label className="floating-label" htmlFor="si-email">Email address</label>
+                        <span className="input-icon">
+                          <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/></svg>
+                        </span>
+                      </div>
+                      <div className="input-group">
+                        <input id="si-password" type={siShowPw ? "text" : "password"} placeholder=" "
+                          autoComplete="current-password"
+                          value={siPassword} onChange={e => setSiPassword(e.target.value)} />
+                        <label className="floating-label" htmlFor="si-password">Password</label>
+                        <span className="input-icon">
+                          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                        </span>
+                        <button type="button" className="toggle-visibility"
+                          aria-label={siShowPw ? "Hide password" : "Show password"}
+                          onClick={() => setSiShowPw(v => !v)}>
+                          <EyeIcon open={siShowPw} />
+                        </button>
+                      </div>
+                      <div className="inline-row">
+                        <span />
+                        <button type="button" className="link-btn" onClick={() => setModal("forgot")}>
+                          Forgot password?
+                        </button>
+                      </div>
+                      <button type="submit" className="btn-primary" disabled={siLoading}>
+                        {siLoading ? "Signing in…" : "Sign in"}
+                      </button>
+                    </form>
+                  </>
+                )}
 
-                  <button type="submit" className="btn-primary" disabled={siLoading}>
-                    {siLoading ? "Signing in…" : "Sign in"}
-                  </button>
-                </form>
+                {/* ── Student sign-in ── */}
+                {loginTab === "student" && (
+                  <>
+                    {stError && <div className="auth-notice error" role="alert">{stError}</div>}
+                    <form onSubmit={handleStudentLogin} noValidate>
+                      <div className="input-group">
+                        <input id="st-username" type="text" placeholder=" " autoComplete="username"
+                          value={stUsername} onChange={e => setStUsername(e.target.value)} />
+                        <label className="floating-label" htmlFor="st-username">Username</label>
+                        <span className="input-icon">
+                          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </span>
+                      </div>
+                      <div className="input-group">
+                        <input id="st-pin" type={stShowPin ? "text" : "password"} placeholder=" "
+                          autoComplete="current-password" inputMode="numeric"
+                          maxLength={6} pattern="\d{6}"
+                          value={stPin} onChange={e => setStPin(e.target.value.replace(/\D/g, "").slice(0, 6))} />
+                        <label className="floating-label" htmlFor="st-pin">6-digit PIN</label>
+                        <span className="input-icon">
+                          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                        </span>
+                        <button type="button" className="toggle-visibility"
+                          aria-label={stShowPin ? "Hide PIN" : "Show PIN"}
+                          onClick={() => setStShowPin(v => !v)}>
+                          <EyeIcon open={stShowPin} />
+                        </button>
+                      </div>
+                      <button type="submit" className="btn-primary"
+                        disabled={stLoading || stUsername.trim().length < 3 || stPin.length !== 6}>
+                        {stLoading ? "Signing in…" : "Sign in"}
+                      </button>
+                    </form>
+                  </>
+                )}
 
                 <p className="trial-link">
                   New here?
@@ -355,17 +460,21 @@ export function AuthCard({ initialView = "sign-in" }: { initialView?: "sign-in" 
                   </button>
                 </p>
 
-                <div className="social-divider">Or continue with</div>
-                <div className="social-list">
-                  {SOCIAL_PROVIDERS.map(({ key, label, icon }) => (
-                    <button key={key} type="button" className="social-btn"
-                      onClick={() => setModal("contact")}
-                      aria-label={`Sign in with ${label}`}>
-                      <span className="social-icon">{icon}</span>
-                      <span className="social-label">Sign in with {label}</span>
-                    </button>
-                  ))}
-                </div>
+                {loginTab === "parent" && (
+                  <>
+                    <div className="social-divider">Or continue with</div>
+                    <div className="social-list">
+                      {SOCIAL_PROVIDERS.map(({ key, label, icon }) => (
+                        <button key={key} type="button" className="social-btn"
+                          onClick={() => setModal("contact")}
+                          aria-label={`Sign in with ${label}`}>
+                          <span className="social-icon">{icon}</span>
+                          <span className="social-label">Sign in with {label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
 
                 <div className="help-block">
                   <a href="#" onClick={e => { e.preventDefault(); setModal("contact"); }}>Need help?</a>
@@ -383,13 +492,7 @@ export function AuthCard({ initialView = "sign-in" }: { initialView?: "sign-in" 
             <div className={`${styles.overlayCol} ${styles.overlaySignin}`}>
               <div className={styles.overlayText}>
                 <div className={styles.overlayLogo}>
-                  <svg className={styles.overlayLogoSvg} viewBox="85 56 262 218" aria-hidden="true">
-                    <use href="#mm-logo" width="1235" height="317" />
-                  </svg>
-                  <span className={styles.overlayWordmark}>
-                    <span className={styles.wMind}>Mind</span>
-                    <span className={styles.wMosaic}>Mosaic</span>
-                  </span>
+                  <MindMosaicLogo className={styles.overlayLogoImg} />
                 </div>
                 <h2>Your streak is waiting</h2>
                 <p>Every session sharpens your edge. Keep the momentum going.</p>
@@ -414,13 +517,7 @@ export function AuthCard({ initialView = "sign-in" }: { initialView?: "sign-in" 
             <div className={`${styles.overlayCol} ${styles.overlaySignup}`}>
               <div className={styles.overlayText}>
                 <div className={styles.overlayLogo}>
-                  <svg className={styles.overlayLogoSvg} viewBox="85 56 262 218" aria-hidden="true">
-                    <use href="#mm-logo" width="1235" height="317" />
-                  </svg>
-                  <span className={styles.overlayWordmark}>
-                    <span className={styles.wMind}>Mind</span>
-                    <span className={styles.wMosaic}>Mosaic</span>
-                  </span>
+                  <MindMosaicLogo className={styles.overlayLogoImg} />
                 </div>
                 <h2>Begin your journey</h2>
                 <p>Build your personalised learning path and master exam prep that actually sticks.</p>

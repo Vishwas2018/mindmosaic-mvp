@@ -19,6 +19,12 @@ const dmSerifDisplay = DM_Serif_Display({
 export const metadata: Metadata = {
   title: "MindMosaic",
   description: "Personalised exam preparation for every learner",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: { url: "/favicon.svg" },
+  },
 };
 
 export default function RootLayout({

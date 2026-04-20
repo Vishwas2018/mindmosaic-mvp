@@ -17,8 +17,8 @@
 /* ─── Card container ────────────────────────────────────────── */
 .authCard {
   position: relative;
-  height: 680px;
-  width: 1060px;
+  height: 700px;
+  width: 1120px;
   max-width: 100%;
   overflow: hidden;
   background-color: #FFFFFF;
@@ -110,27 +110,27 @@
   flex-direction: column;
   align-items: center;
   gap: .35rem;
-  margin-bottom: .75rem;
+  margin-bottom: 1rem;
 }
-.overlayLogoSvg {
-  width: 52px;
-  height: 43px;
+/* Static SVG logo on the purple overlay panel — inverted to white */
+.overlayLogoImg {
+  height: 56px;
+  max-width: min(220px, 100%);
+  width: auto;
   display: block;
+  filter: brightness(0) invert(1);
   animation: overlayBrainFlash 2.6s ease-in-out infinite;
 }
+.overlayLogoImg:hover {
+  animation-play-state: paused;
+}
 @keyframes overlayBrainFlash {
-  0%, 100% { opacity: 1; filter: drop-shadow(0 0 0px rgba(239,104,67,0)); }
-  45%       { opacity: .88; filter: drop-shadow(0 0 6px rgba(239,140,86,.75)) drop-shadow(0 0 12px rgba(255,255,255,.2)); }
+  0%, 100% { opacity: 1;   filter: brightness(0) invert(1) drop-shadow(0 0 0px  rgba(255,255,255,0)); }
+  45%       { opacity: .88; filter: brightness(0) invert(1) drop-shadow(0 0 8px  rgba(255,255,255,.5)); }
 }
-.overlayWordmark {
-  font-size: 1rem;
-  font-weight: 800;
-  letter-spacing: -.025em;
-  line-height: 1;
-  color: #fff;
+@media (prefers-reduced-motion: reduce) {
+  .overlayLogoImg { animation: none; }
 }
-.overlayWordmark .wMind   { color: rgba(255,255,255,.92); }
-.overlayWordmark .wMosaic { color: #ef8c56; }
 
 .overlayText h2 {
   font-family: var(--font-dm-serif), 'DM Serif Display', serif;
@@ -205,7 +205,7 @@
   border: 1px solid #E9E5F5;
   border-radius: 18px;
   width: 100%;
-  max-width: 25rem;
+  max-width: 27rem;
   box-shadow:
     0 0 0 1px rgba(30,27,75,.02),
     0 2px 8px rgba(89,37,168,.08);

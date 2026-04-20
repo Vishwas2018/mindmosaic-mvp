@@ -7,7 +7,7 @@ export default function LogoutButton() {
     <form action={signOutAction}>
       <button
         type="submit"
-        className="text-sm text-[#7C7399] hover:text-[#5925a8] font-medium transition-colors"
+        className="text-sm text-slate-500 hover:text-brand-500 font-medium transition-colors"
       >
         Sign out
       </button>

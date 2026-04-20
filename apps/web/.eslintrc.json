@@ -1,3 +1,12 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"]
+  "extends": ["next/core-web-vitals", "next/typescript"],
+  "rules": {
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": "JSXAttribute[name.name='className'] > Literal[value=/.*#[0-9a-fA-F]{3,8}.*/]",
+        "message": "Use a design token (var(--...)) or Tailwind class instead of a bare hex value in className."
+      }
+    ]
+  }
 }
